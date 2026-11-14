@@ -1,0 +1,33 @@
+{
+  "_comment": "DVPE inspect-mode config template. Pass with --config. All keys optional; unknown keys are ignored. See video_processing/dvpe/config_io.py.",
+
+  "selection": { "mode": "inspect" },
+
+  "scoring": {
+    "weights": {
+      "sharpness": 0.35,
+      "contrast": 0.20,
+      "brightness": 0.15,
+      "exposure": 0.15,
+      "noise": 0.15
+    }
+  },
+
+  "inspect": {
+    "weights": { "quality": 0.40, "uniqueness": 0.25, "diversity": 0.20, "coverage": 0.15 },
+    "hover_fps": 1.0,
+    "move_fps": 4.0,
+    "rotate_fps": 6.0,
+    "hover_motion_max": 2.0,
+    "move_motion_max": 8.0,
+    "history_size": 8,
+    "novelty_cap": 16.0,
+    "diversity_motion_cap": 30.0,
+    "coverage_gap_cap": 1.0,
+    "reason_threshold": 0.6
+  },
+
+  "dedup_history_size": 8,
+  "coverage": { "max_gap_seconds": 1.0 },
+  "duplicate": { "phash_hamming_threshold": 10, "ssim_threshold": 0.92 }
+}

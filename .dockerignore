@@ -1,0 +1,47 @@
+# Keep the build context to source only — mission output, caches and the host
+# virtualenv must never end up in an image layer.
+
+# Python caches / artifacts
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Host virtualenvs (the repo ships one at ../venv; guard against local ones too)
+venv/
+.venv/
+env/
+
+# Pipeline output and inputs — bind-mounted at run time, not baked in
+data/
+videos/
+uploads/
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.m4v
+*.webm
+*.srt
+
+# VCS / editor / OS noise
+.git/
+.gitignore
+.github/
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml
+DOCKER.md

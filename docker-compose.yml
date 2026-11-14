@@ -1,0 +1,64 @@
+# DVPE — batch CLI services. Nothing here is a long-running server, so the usual
+# entry point is `docker compose run --rm <service> …`, not `up`.
+#
+#   docker compose build
+#   docker compose run --rm dvpe --video /app/videos/r.mp4 --mission-id Mission_001
+#   docker compose run --rm tower-grouping --mission-id Mission_001 \
+#       --towers /app/configs/towers.example.json --gps /app/videos/track.srt
+#   docker compose run --rm tests
+#
+# Put input footage in ./videos (mounted read-only at /app/videos).
+# Output lands in ./data/missions/<mission_id>/ on the host.
+
+name: dvpe
+
+x-dvpe-common: &dvpe-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      # false -> skip ffmpeg/ffprobe; DVPE falls back to OpenCV's probe.
+      INSTALL_FFMPEG: "true"
+  image: dvpe:latest
+  init: true
+  volumes:
+    - ./data:/app/data
+    - ./videos:/app/videos:ro
+    - ./configs:/app/configs:ro
+
+services:
+  # Main preprocessing engine. Args after the service name are passed to the CLI.
+  dvpe:
+    <<: *dvpe-common
+    command: ["--help"]
+
+  # Opt-in post-processing: group a finished mission's best frames per tower.
+  tower-grouping:
+    <<: *dvpe-common
+    profiles: ["tools"]
+    entrypoint: ["python", "-m", "video_processing.tower_grouping"]
+    command: ["--help"]
+    volumes:
+      - ./data:/app/data
+      # GPS track (.srt/.json/.csv) usually sits alongside the footage
+      - ./videos:/app/videos:ro
+      - ./configs:/app/configs:ro
+
+  # Test suite inside the image. Fixtures are synthetic and land in tmp_path, so no
+  # footage and no host mounts are needed. `-p no:cacheprovider` because /app is
+  # root-owned (the app cannot rewrite its own code) and pytest's cache lives there.
+  tests:
+    <<: *dvpe-common
+    profiles: ["tests"]
+    entrypoint: ["python", "-m", "pytest"]
+    command: ["tests/", "-v", "-p", "no:cacheprovider"]
+    volumes: []
+
+  # Interactive shell for poking at a mission or running ad-hoc Python.
+  shell:
+    <<: *dvpe-common
+    profiles: ["tools"]
+    entrypoint: ["/bin/bash"]
+    command: []
+    stdin_open: true
+    tty: true

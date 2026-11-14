@@ -1,0 +1,11 @@
+{
+  "_comment": "Tower-grouping config template. Pass with --config. All keys optional; unknown keys are ignored. See video_processing/tower_grouping/config.py.",
+
+  "switch_patience": 3,
+  "max_assign_distance_m": null,
+  "interpolate_gps": true,
+  "gps_max_time_gap_sec": 2.0,
+  "move_frames": false,
+  "folder_prefix": "Tower_",
+  "folder_pad": 3
+}
